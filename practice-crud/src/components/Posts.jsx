@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import InfiniteScroll from "react-infinite-scroll-component";
 import { deletePost, getPost } from '../api/api'
 import '../App.css'
 import Form from './Form'
@@ -10,20 +11,34 @@ const Posts = () => {
     const [updateData, setupdateData] = useState({})
     const [loading, setLoading] = useState(false);
     const [deleteLoadingId, setDeleteLoadingId] = useState(null);
-    const [limit, setLimit] = useState(30);
+    const [page, setpage] = useState(1)
+    const [hasMore, setHasMore] = useState(true);
 
     const getPostData = async () => {
         setLoading(true);
         try {
-            const res = await getPost(limit);
-            // console.log(res.data);
-            setdata(res.data);
+            const res = await getPost(20, page);
+            if (res.data.length === 0) {
+                setHasMore(false);
+            } else {
+                setdata((prev) => {
+                    const newData = res.data.filter(
+                        (newItem) => !prev.some((item) => item.id === newItem.id)
+                    );
+                    return [...prev, ...newData];
+                });
+                setpage((prev) => prev + 1);
+            }
         } catch (error) {
             console.log(error)
         } finally {
             setLoading(false);
         }
     }
+
+    useEffect(() => {
+        getPostData();
+    }, [])
 
     const handleDeletePost = async (id) => {
         setDeleteLoadingId(id);
@@ -44,27 +59,39 @@ const Posts = () => {
         setupdateData(d)
     }
 
-    useEffect(() => {
-        getPostData();
-    }, [])
-
     return (
         <>
             <Form data={data} setdata={setdata} updateData={updateData} setupdateData={setupdateData} />
             <section>
-                <ol>
-                    {loading ? (
-                        <div className="center-loader">
-                            <Loader />
-                        </div>
-                    ) : (
+                {loading && page === 1 ? (
+                    <div className="center-loader">
+                        <Loader />
+                    </div>
+                ) : (
+                    <InfiniteScroll
+                        dataLength={data.length}
+                        next={getPostData}
+                        hasMore={hasMore}
+                        loader={
+                            <div className="bottom-loader">
+                                <Loader />
+                            </div>
+                        }
+                    >
                         <ol>
                             {data.map((d) => (
                                 <li key={d.id}>
                                     <p>Title: {d.title}</p>
                                     <p>Body: {d.body}</p>
-                                    <button onClick={() => handleUpdatePost(d)}>Edit</button>
-                                    <button onClick={() => handleDeletePost(d.id)} disabled={deleteLoadingId === d.id}>
+
+                                    <button onClick={() => handleUpdatePost(d)}>
+                                        Edit
+                                    </button>
+
+                                    <button
+                                        onClick={() => handleDeletePost(d.id)}
+                                        disabled={deleteLoadingId === d.id}
+                                    >
                                         {deleteLoadingId === d.id ? (
                                             <div className="small"><Loader /></div>
                                         ) : (
@@ -74,8 +101,8 @@ const Posts = () => {
                                 </li>
                             ))}
                         </ol>
-                    )}
-                </ol>
+                    </InfiniteScroll>
+                )}
             </section>
         </>
     )

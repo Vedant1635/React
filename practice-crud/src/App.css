@@ -38,6 +38,11 @@ form {
   align-items: center;
   height: 600px;
 }
+.bottom-loader {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+}
 .small .loader {
   width: 12px;
 }

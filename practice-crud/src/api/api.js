@@ -4,10 +4,8 @@ const api = axios.create({
     baseURL: "https://jsonplaceholder.typicode.com"
 })
 
-export const getPost = (limit) => {
-  return api.get("/posts", {
-    params: { _limit: limit }
-  });
+export const getPost = (limit, page) => {
+  return api.get(`/posts?_limit=${limit}&_page=${page}`);
 };
 
 export const deletePost = (id) => {
