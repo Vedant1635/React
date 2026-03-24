@@ -81,7 +81,7 @@ const Form = ({ data, setdata, updateData, setupdateData }) => {
                         <label htmlFor="body"></label>
                         <input type="text" id='body' value={addData.body} name='body' placeholder='Add Post' onChange={handleInputChange} />
                     </div>
-                    <button type='submit' disabled={loading}>{loading ? <div className="small"><Loader /></div> : updateData && updateData.id ? "Update" : "Add"}</button>
+                    <button type='submit' disabled={loading}>{loading ? <Loader className="small" /> : updateData && updateData.id ? "Update" : "Add"}</button>
                 </form>
             </div>
         </>

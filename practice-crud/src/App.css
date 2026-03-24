@@ -43,8 +43,13 @@ form {
   justify-content: center;
   padding: 1rem;
 }
-.small .loader {
+.loader.small {
   width: 12px;
+}
+.no-data {
+  text-align: center;
+  font-size: 18px;
+  margin-top: 20px;
 }
 @keyframes l26 {
   100% {transform:rotate(1turn)}

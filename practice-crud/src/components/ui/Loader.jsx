@@ -1,7 +1,11 @@
-import "../../App.css"
+import "../../App.css";
 
-const Loader = () => {
-    return <div className="loader"></div>
-}
+const Loader = ({ className = "", wrapperClass = "" }) => {
+  return (
+    <div className={wrapperClass}>
+      <div className={`loader ${className}`}></div>
+    </div>
+  );
+};
 
-export default Loader
+export default Loader;

@@ -64,18 +64,17 @@ const Posts = () => {
             <Form data={data} setdata={setdata} updateData={updateData} setupdateData={setupdateData} />
             <section>
                 {loading && page === 1 ? (
-                    <div className="center-loader">
-                        <Loader />
-                    </div>
+                    <Loader wrapperClass="center-loader" />
+                ) : data.length === 0 ? (
+                    <p className="no-data">No Data Found</p>
                 ) : (
                     <InfiniteScroll
                         dataLength={data.length}
                         next={getPostData}
                         hasMore={hasMore}
+                        style={{ overflow: 'hidden' }}
                         loader={
-                            <div className="bottom-loader">
-                                <Loader />
-                            </div>
+                            <Loader wrapperClass="bottom-loader" />
                         }
                     >
                         <ol>
@@ -93,7 +92,7 @@ const Posts = () => {
                                         disabled={deleteLoadingId === d.id}
                                     >
                                         {deleteLoadingId === d.id ? (
-                                            <div className="small"><Loader /></div>
+                                            <Loader className="small" />
                                         ) : (
                                             "Delete"
                                         )}
