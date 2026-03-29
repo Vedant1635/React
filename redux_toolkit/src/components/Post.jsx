@@ -1,53 +1,38 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import InfiniteScroll from "react-infinite-scroll-component";
-import { setLoading, setError, appendData, incrementPage, setHasMore } from '../redux/slices/postSlice'
-import { getPost } from '../api/api'
+import { fetchPosts, postActions } from '../redux/slices/postSlice';
 
 const Posts = () => {
     const dispatch = useDispatch()
-    const { data, isLoading, isError, page, limit, hasMore } = useSelector((state) => state.posts)
-
-    const fetchPosts = async () => {
-        try {
-            dispatch(setLoading(true))
-            dispatch(setError(false))
-
-            const res = await getPost(limit, page);
-
-            dispatch(appendData(res.data))
-
-            if (res.data?.length < limit) {
-                dispatch(setHasMore(false))
-            } else {
-                dispatch(incrementPage())
-            }
-        } catch (error) {
-            dispatch(setError(true))
-        } finally {
-            dispatch(setLoading(false))
-        }
-    }
+    const { data, isLoading, message, page, limit, hasMore } = useSelector((state) => state.posts)
 
     useEffect(() => {
-        fetchPosts()
+        dispatch(fetchPosts(limit, page))
     }, [])
+
+     const handleRefresh = () => {
+        dispatch(postActions.reset())
+        dispatch(fetchPosts(limit,1))
+    }
 
     return (
         <div>
             <h2>Posts</h2>
-            {isLoading && page === 1 && <h3>Loading...</h3>}
+            <button onClick={handleRefresh}>Refresh</button>
+            
+            {isLoading && data?.length === 0 && <h3>Loading...</h3>}
 
-            {isError && <h3>Error occurred</h3>}
+            {message && <h3>Error: {message}</h3>}
 
-            {!isLoading && !isError && data?.length === 0 && (
+            {!isLoading && data.length === 0 && !message && (
                 <h3>No Data Found</h3>
             )}
 
             {data?.length > 0 && (
                 <InfiniteScroll
                     dataLength={data?.length}
-                    next={fetchPosts}
+                    next={() => dispatch(fetchPosts(limit, page))}
                     hasMore={hasMore}
                     loader={<h4>Loading more...</h4>}
                 >
